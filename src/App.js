@@ -99,10 +99,10 @@ function App() {
             multiplier: 16,
         },
     ];
-    const [sequence] = useState(() => {
+    const [sequence, setSequence] = useState(() => {
         const s = [];
         for (let i = 0; i < 16; i++) {
-            s.push(notes[Math.floor(Math.random() * 12)]);
+            s.push(notes[Math.floor(Math.random() * 12)].frequency);
         }
         return s;
     });
@@ -111,7 +111,7 @@ function App() {
 
     useInterval(() => {
         if (play) {
-            sound.frequency = sequence[currentStep].frequency * octave;
+            sound.frequency = sequence[currentStep] * octave;
             sound.play();
             setTimeout(() => {
                 sound.stop();
@@ -141,6 +141,10 @@ function App() {
         setOctave(Number(event.target.value));
     };
 
+    const changeNote = (frequency, index) => {
+        setSequence([...sequence.slice(0, index), frequency, ...sequence.slice(index + 1)]);
+    };
+
     return (
         <div className="App">
             <header className="App-header">
@@ -149,8 +153,8 @@ function App() {
                         <option value={o.multiplier}>Octave {o.name}</option>
                     ))}
                 </select>
-                {sequence.map((s) => (
-                    <select value={s.frequency}>
+                {sequence.map((s, i) => (
+                    <select value={s} onChange={(e) => changeNote(Number(e.target.value), i)}>
                         {notes.map((n) => (
                             <option value={n.frequency}>{n.name}</option>
                         ))}
