@@ -8,7 +8,7 @@ function App() {
     const [sound, setSound] = useState(
         new Pizzicato.Sound({
             source: 'wave',
-            options: { type: 'sine', attack: 0.1, release: 0.5 },
+            options: { type: 'triangle', attack: 0.5, release: 0.5 },
         }),
     );
     const notes = [
@@ -60,6 +60,10 @@ function App() {
             name: 'B',
             frequency: 493.88,
         },
+        {
+            name: '-',
+            frequency: 1,
+        },
     ];
     const octaves = [
         {
@@ -102,7 +106,7 @@ function App() {
     const [sequence, setSequence] = useState(() => {
         const s = [];
         for (let i = 0; i < 16; i++) {
-            s.push(notes[Math.floor(Math.random() * 12)].frequency);
+            s.push(notes[Math.floor(Math.random() * notes.length)].frequency);
         }
         return s;
     });
@@ -144,7 +148,7 @@ function App() {
     const changeNote = (frequency, index) => {
         setSequence([...sequence.slice(0, index), frequency, ...sequence.slice(index + 1)]);
     };
-
+    // I step late
     return (
         <div className="App">
             <header className="App-header">
@@ -156,11 +160,20 @@ function App() {
                 {sequence.map((s, i) => (
                     <select value={s} onChange={(e) => changeNote(Number(e.target.value), i)}>
                         {notes.map((n) => (
-                            <option value={n.frequency}>{n.name}</option>
+                            <option value={n.frequency}>
+                                {currentStep === i ? '>>>' : ''} {n.name}
+                            </option>
                         ))}
                     </select>
                 ))}
                 {currentStep}
+                <input
+                    type="number"
+                    value={sound.attack}
+                    onChange={(e) => changeOption(Number(e.target.value), 'attack')}
+                    step="0.1"
+                    min="0.1"
+                ></input>
                 <input
                     type="number"
                     value={sound.release}
